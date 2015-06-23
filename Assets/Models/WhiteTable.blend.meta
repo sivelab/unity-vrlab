@@ -1,6 +1,6 @@
 fileFormatVersion: 2
-guid: 6b2ce1b00c2b6476492e347ca6bb43bb
-timeCreated: 1435068027
+guid: cb77c095ee22444efa0914ef3dfd2ea6
+timeCreated: 1435074133
 licenseType: Free
 ModelImporter:
   serializedVersion: 18
@@ -46,8 +46,8 @@ ModelImporter:
     keepQuads: 0
     weldVertices: 1
     secondaryUVAngleDistortion: 8
-    secondaryUVAreaDistortion: 15
-    secondaryUVHardAngle: 67
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
     secondaryUVPackMargin: 4
     useFileScale: 1
   tangentSpace:
