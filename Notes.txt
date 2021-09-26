@@ -1,0 +1,22 @@
+25 Sep 2021
+
+Goals:
+
+	Unity Scene with object tracking
+	Headset tracking
+
+Extra:
+
+	object interaction
+	
+Done:
+	Track Motive objects in Unity
+	Setup Unity XR
+	Motive + Pico Neo SDKs
+	Build for Pico Neo
+	Run on Pico Neo (via USB transfer - Possible to do over network ??)
+	
+Issues:
+	External view in Pico Neo - not immersive
+	User Entitlement Check (optional)
+	Need to broadcast Motive data over wifi so the app on the Pico Neo can access it
