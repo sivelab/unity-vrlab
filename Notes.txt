@@ -20,3 +20,21 @@ Issues:
 	External view in Pico Neo - not immersive
 	User Entitlement Check (optional)
 	Need to broadcast Motive data over wifi so the app on the Pico Neo can access it
+
+3 Oct
+
+Goals:
+	
+	Object tracking via Motive
+	Pico Neo camera setup
+	
+Done:
+	
+	Object tracking via Motive
+	Pico Neo camera setup
+	Properly initialize XR scene
+	
+Issues:
+	Object position/model in scene
+	Motive data over network
+	Wireless way to build and deplot program ? (QoL)
