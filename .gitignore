@@ -6,6 +6,7 @@
 [Oo]bj/
 [Uu]nityGenerated/
 [Bb]uild/
+*.log
 
 # ===================================== #
 # Visual Studio / MonoDevelop generated #
