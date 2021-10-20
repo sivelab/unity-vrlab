@@ -92,9 +92,36 @@ public class CameraRigidBody : MonoBehaviour
     void Update()
     {
         UpdatePose();
+
+
+        // Smoothing for vision center object
+        // Should be its own class but ehhh
+        alignmentLastPos.Enqueue(this.transform.position + this.transform.TransformDirection(new Vector3(0, 0, 1)) * visionObjectDist);
+        if (alignmentLastPos.Count > maxQueueSize)
+        {
+            alignmentLastPos.Dequeue();
+        }
+
+        // Average values
+        Vector3 total = Vector3.zero;
+        foreach (Vector3 pos in alignmentLastPos)
+        {
+            total += pos;
+        }
+
+        // Set pos to average
+        visionAlignmentObject.transform.position = total / (float)alignmentLastPos.Count;
+
     }
 
+    public Vector3 vec3OculusToMotiveRotation = new Vector3(0, 90, 0);
+    public Vector3 eyePositionOffsetFromTracker = new Vector3(0, 0, 0);
+    public GameObject visionAlignmentObject;
 
+    Queue<Vector3> alignmentLastPos = new Queue<Vector3>();
+    int maxQueueSize = 15;
+
+    public float visionObjectDist = 0.7f;
     void UpdatePose()
     {
         OptitrackRigidBodyState rbState = StreamingClient.GetLatestRigidBodyState( RigidBodyId, NetworkCompensation);
@@ -102,12 +129,19 @@ public class CameraRigidBody : MonoBehaviour
         {
             // Only pull position from Motive
             // Use average of last two calls
-            lastPos += rbState.Pose.Position;
-            lastPos.Scale(halfScalar);
+            // But only if you have a position input
+            if (!rbState.Pose.Position.Equals(Vector3.zero))
+            {
+                lastPos += rbState.Pose.Position + eyePositionOffsetFromTracker;
+                lastPos *= 0.5f;
+            }
+
 
             this.transform.localPosition = lastPos;
             // this.transform.localPosition = rbState.Pose.Position;
-            // this.transform.localRotation = rbState.Pose.Orientation;
+
+            // Coordinate system hardocded adjustment
+            this.transform.localRotation = Quaternion.Euler(this.transform.localRotation.eulerAngles + vec3OculusToMotiveRotation);
         }
     }
 }

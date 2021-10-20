@@ -15,6 +15,7 @@ limitations under the License.
 */
 
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 
@@ -77,14 +78,52 @@ public class ChairRigidBody : MonoBehaviour
         UpdatePose();
     }
 
+    Queue<Vector3> chairLastPosQueue = new Queue<Vector3>();
+    Queue<Vector3> chairLastRotQueue = new Queue<Vector3>();
+
+    int maxQueueSize = 15;
 
     void UpdatePose()
     {
         OptitrackRigidBodyState rbState = StreamingClient.GetLatestRigidBodyState( RigidBodyId, NetworkCompensation);
         if ( rbState != null )
         {
-            this.transform.localPosition = rbState.Pose.Position;
-            this.transform.localRotation = rbState.Pose.Orientation;
+            // Smoothing for object
+            // Should be its own class but ehhh
+            chairLastPosQueue.Enqueue(rbState.Pose.Position);
+            chairLastRotQueue.Enqueue(rbState.Pose.Orientation.eulerAngles);
+
+            if (chairLastPosQueue.Count > maxQueueSize)
+            {
+                chairLastPosQueue.Dequeue();
+            }
+
+            if (chairLastRotQueue.Count > maxQueueSize)
+            {
+                chairLastRotQueue.Dequeue();
+            }
+
+            // Average values
+            Vector3 totalpos = Vector3.zero;
+            Vector3 totalrot = Vector3.zero;
+
+            foreach (Vector3 pos in chairLastPosQueue)
+            {
+                totalpos += pos;
+            }
+
+            foreach (Vector3 rot in chairLastRotQueue)
+            {
+                totalrot += rot;
+            }
+
+            // Set pos to average
+            this.transform.localPosition = totalpos / (float)chairLastPosQueue.Count;
+            // Only care about y rot
+            this.transform.localRotation = Quaternion.Euler(new Vector3(0, totalrot.y / (float)chairLastRotQueue.Count, 0));
+
+            //this.transform.localPosition = rbState.Pose.Position;
+            //this.transform.localRotation = rbState.Pose.Orientation;
         }
     }
 }
