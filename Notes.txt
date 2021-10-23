@@ -38,3 +38,19 @@ Issues:
 	Object position/model in scene
 	Motive data over network
 	Wireless way to build and deplot program ? (QoL)
+	
+20 Oct 2021
+
+Moved to Rift S
+Have headset tracking good
+
+position and rotation are from the right places
+
+TODO: get transforms working (the camera rotation relative to the other objects is weird, for example)
+TODO: need offset for table, chair pivots and probably rotations
+TODO: visuals for table / chairs
+TODO: track hand positions
+TODO: script to create and end the task (stack blocks)
+TODO: incorporate grabbing with task objects
+TODO: hands (controllers) should be relative to the chair or table. THis means that there needs\
+ to be an offset from the headset to that object, since theya re tracked by the headset 

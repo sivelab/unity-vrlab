@@ -118,9 +118,9 @@ public class ChairRigidBody : MonoBehaviour
             }
 
             // Set pos to average
-            this.transform.localPosition = totalpos / (float)chairLastPosQueue.Count;
+            this.transform.position = totalpos / (float)chairLastPosQueue.Count;
             // Only care about y rot
-            this.transform.localRotation = Quaternion.Euler(new Vector3(0, totalrot.y / (float)chairLastRotQueue.Count, 0));
+            this.transform.rotation = Quaternion.Euler(new Vector3(0, totalrot.y / (float)chairLastRotQueue.Count, 0));
 
             //this.transform.localPosition = rbState.Pose.Position;
             //this.transform.localRotation = rbState.Pose.Orientation;

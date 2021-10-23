@@ -15,14 +15,13 @@ limitations under the License.
 */
 
 using System;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.XR;
+
 
 /// <summary>
 /// Implements live tracking of streamed OptiTrack rigid body data onto an object.
 /// </summary>
-public class CameraRigidBody : MonoBehaviour
+public class TableRigidBody : MonoBehaviour
 {
     [Tooltip("The object containing the OptiTrackStreamingClient script.")]
     public OptitrackStreamingClient StreamingClient;
@@ -32,14 +31,6 @@ public class CameraRigidBody : MonoBehaviour
 
     [Tooltip("Subscribes to this asset when using Unicast streaming.")]
     public bool NetworkCompensation = true;
-
-
-    // Smooth position
-    Vector3 lastPos = Vector3.zero;
-    Vector3 halfScalar = new Vector3(0.5f, 0.5f, 0.5f);
-
-    List<UnityEngine.XR.InputDevice> inputDevices = new List<UnityEngine.XR.InputDevice>();
-
 
     void Start()
     {
@@ -58,14 +49,6 @@ public class CameraRigidBody : MonoBehaviour
         }
 
         this.StreamingClient.RegisterRigidBody( this, RigidBodyId );
-
-        UnityEngine.XR.InputDevices.GetDevices(inputDevices);
-
-        foreach (var device in inputDevices)
-        {
-            Debug.Log(string.Format("Device found with name '{0}' and role '{1}'", device.name, device.role.ToString()));
-        }
-
     }
 
 
@@ -92,56 +75,26 @@ public class CameraRigidBody : MonoBehaviour
     void Update()
     {
         UpdatePose();
-
-
-        // Smoothing for vision center object
-        // Should be its own class but ehhh
-        alignmentLastPos.Enqueue(this.transform.position + this.transform.TransformDirection(new Vector3(0, 0, 1)) * visionObjectDist);
-        if (alignmentLastPos.Count > maxQueueSize)
-        {
-            alignmentLastPos.Dequeue();
-        }
-
-        // Average values
-        Vector3 total = Vector3.zero;
-        foreach (Vector3 pos in alignmentLastPos)
-        {
-            total += pos;
-        }
-
-        // Set pos to average
-        visionAlignmentObject.transform.position = total / (float)alignmentLastPos.Count;
-
     }
 
-    public Vector3 vec3OculusToMotiveRotation = new Vector3(0, 90, 0);
-    public Vector3 eyePositionOffsetFromTracker = new Vector3(0, 0, 0);
-    public GameObject visionAlignmentObject;
 
-    Queue<Vector3> alignmentLastPos = new Queue<Vector3>();
-    int maxQueueSize = 15;
-
-    public float visionObjectDist = 0.7f;
     void UpdatePose()
     {
         OptitrackRigidBodyState rbState = StreamingClient.GetLatestRigidBodyState( RigidBodyId, NetworkCompensation);
         if ( rbState != null )
         {
-            // Only pull position from Motive
-            // Use average of last two calls
-            // But only if you have a position input
-            if (!rbState.Pose.Position.Equals(Vector3.zero))
+            this.transform.position = rbState.Pose.Position;
+            this.transform.rotation = rbState.Pose.Orientation;
+
+            if (transform.position.Equals(Vector3.zero))
             {
-                lastPos += rbState.Pose.Position + eyePositionOffsetFromTracker;
-                lastPos *= 0.5f;
+                Debug.LogError("Table recieved position zero! This is probably bad!");
             }
 
-
-            this.transform.localPosition = lastPos;
-            // this.transform.localPosition = rbState.Pose.Position;
-
-            // Coordinate system hardocded adjustment
-            this.transform.localRotation = Quaternion.Euler(this.transform.localRotation.eulerAngles + vec3OculusToMotiveRotation);
+            if (transform.rotation.Equals(Quaternion.identity))
+            {
+                Debug.LogError("Table recieved identity quaternion! This is probably bad!");
+            }
         }
     }
 }
